@@ -6,7 +6,7 @@ import (
 	"net/http/httputil"
 )
 
-type RequestFunc func(*http.Request)
+type RequestFunc func(http.ResponseWriter, *http.Request)
 
 type Dumper struct {
 	addr         string
@@ -25,7 +25,7 @@ func (d *Dumper) Listen() error {
 		fmt.Print(string(dump))
 		for _, fn := range d.requestFuncs {
 			if fn != nil {
-				fn(r)
+				fn(w, r)
 			}
 		}
 	}))
