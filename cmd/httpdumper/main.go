@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
+	"net/http"
 
 	"github.com/juztin/httpdumper"
 )
@@ -11,7 +11,7 @@ import (
 func main() {
 	addr := flag.String("addr", ":4040", "Address to listen on (default :4040)")
 	flag.Parse()
-	dumper := httpdumper.New(*addr, nil)
+	dumper := httpdumper.New(nil)
 	fmt.Printf("listening on %s...\n", *addr)
-	log.Fatalln(dumper.Listen())
+	http.ListenAndServe(*addr, dumper)
 }

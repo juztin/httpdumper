@@ -9,28 +9,25 @@ import (
 type RequestFunc func(http.ResponseWriter, *http.Request)
 
 type Dumper struct {
-	addr         string
 	requestFuncs []RequestFunc
 }
 
-func (d *Dumper) Listen() error {
-	return http.ListenAndServe(d.addr, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println("------------------------------------Request-------------------------------------")
-		dump, err := httputil.DumpRequest(r, true)
-		if err != nil {
-			http.Error(w, fmt.Sprint(err), http.StatusInternalServerError)
-			fmt.Println(err)
-			return
+func (d *Dumper) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("------------------------------------Request-------------------------------------")
+	dump, err := httputil.DumpRequest(r, true)
+	if err != nil {
+		http.Error(w, fmt.Sprint(err), http.StatusInternalServerError)
+		fmt.Println(err)
+		return
+	}
+	fmt.Print(string(dump))
+	for _, fn := range d.requestFuncs {
+		if fn != nil {
+			fn(w, r)
 		}
-		fmt.Print(string(dump))
-		for _, fn := range d.requestFuncs {
-			if fn != nil {
-				fn(w, r)
-			}
-		}
-	}))
+	}
 }
 
-func New(addr string, funcs ...RequestFunc) *Dumper {
-	return &Dumper{addr, funcs}
+func New(funcs ...RequestFunc) *Dumper {
+	return &Dumper{funcs}
 }
