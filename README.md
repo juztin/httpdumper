@@ -30,5 +30,5 @@ func customFn2(r *http.Request) {
 }
 
 
-dumper, err := httpdumper.New(":4040", customFn1, customFn2)
+h, err := httpdumper.New(customFn1, customFn2)
 ```
